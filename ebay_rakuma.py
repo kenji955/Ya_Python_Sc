@@ -20,19 +20,32 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.support.select import Select
 
 # 一覧ページから取得する情報
+items_id = []
 items_condition = []
 items_name_ja = []
 items_name_en = []
 items_condition_en = []
 items_price = []
-top_img_urls = []
+items_image_url = []
 items_Descriptions = []
 postage_price_list = []
 
 
-# 各商品apiから取得する情報
-items_id = []
-items_image_url = []
+# 抽出する画面で変わる情報
+# URL ?b=に変更
+page_url_after = ['&b=']
+# 一覧ページの読み込み待ち対象
+until_element_top = ['Products__items']
+# リストのタグ
+items_list_tagName = ['li']
+# リストのクラス名
+items_list_className = ['Product']
+# 価格情報
+price_info_className = ['Price--buynow']
+# 価格情報の文字列
+price_text = ['即決']
+# 送料情報
+postageDetail_element_text = ['postageDetailBuy']
 
 
 def set_driver(driver_path):
@@ -69,11 +82,6 @@ class MyScraping():
     # 状態の判定
     # 与えられた文字列＝商品の状態によって特定の文字列を返す
     def judge_condition(self, string):
-        # 未使用：Condition:Mint.
-        # 未使用に近い：Condition:Near Mint.
-        # 目立った傷や汚れなし：Condition:Excellent.
-        # やや傷や汚れあり：Condition:Very Good.
-        # 傷や汚れあり：Condition:Good.
         condition = ""
 
         if string == "未使用":
@@ -105,24 +113,6 @@ class MyScraping():
         translator = Translator()
         result = translator.translate(string, src='ja', dest='en')
         return result.text
-
-    # APIの設定
-    # 楽天API。不要？
-    def get_api(self, params):
-        url = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706?'
-        result = requests.get(url, params=params)
-        return result.json()
-
-    # APIの設定
-    # 楽天API。不要？
-    def set_api_parameter(self):
-        app_id = 1064309786905776599
-        params = {
-            "format": "json",
-            "applicationId": [app_id],
-            "formatVersion": 2,
-        }
-        return params
 
     # 画像URLの設定
     # 複数の画像URLを一つの文字列にまとめて返す
@@ -210,12 +200,46 @@ class MyScraping():
         html_text = '<font rwr=\"1\" size=\"4\" style=\"font-family:Arial\"><div class=\"banner_topr\" style=\"height: 200px; width: 100%; background-image: url(\'https://www.saatscommerce.com/te_rsc/XOther_Japanese_c04/us/images/c_top.jpg\'); background-repeat: no-repeat; background-size: cover; \"></div><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Description</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"></p><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><span style=\"font-size: large;\"><span style=\"font-family: &quot;Noto Sans JP&quot;, sans-serif; background-color: rgb(255, 255, 255);\">Please see the attached photographs for detailed item conditions.<br><br>●●<br><br><b>This product is 100% authentic.<br>We have several other items in stock, so please contact us.<br><br><br>[Customer\'s Feedback!]<br>\"OUTSTANDING SELLER! Fast shipping. Thanks so much for a wonderful transaction.\"<br>\"Fast delivery, perfect product. 100% satisfied. 5 star to seller. Thank you..\"<br>\"Totally worth it!!!thanks again awesome deck!!It arrived thanks!!\"<br>\"Amazing communication and ship speed. Items exactly as described. A+++ Thank u!!\"<br>\"Really beautiful transaction and super fast shipment from Japan, thank you!\"<br>\"Excellent service provided by the seller from start to end! Highly Recommended!\"<br>\"***Highly recommend to purchase from this seller*** Really friendly and reliable\"<br><br>...Thank You!</b></span><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><span style=\"font-size: large;\"><span style=\"font-family: &quot;Noto Sans JP&quot;, sans-serif; background-color: rgb(255, 255, 255);\"><br></span></span></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Payment</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">We only accept PayPal payments.<br>Please pay within 5 days after auction is finished.</p><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><br></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Shipping</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"></p><br style=\"font-size: 14px; font-weight: 400;\"><div id=\"shipping_duration_table\" style=\"font-size: 14px; font-weight: 400;\"><b>Shipping Duration</b><table class=\"table_shipping\" style=\"width: 770px; border: 1px solid rgb(0, 0, 0); border-collapse: collapse;\"><thead><tr><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Shipping<br>Method</th><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Asia, Middle East</th><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">America,Canada<br>Australia,Mexico</th><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Europe<br>Russia</th><th style=\"width: 144px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Other</th></tr></thead><tbody id=\"shipping_duration_tbody\"><tr><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">DHL, FedEX</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">2 - 3 days</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">3 - 5 days</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">3 - 4 days</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">5 - 7 days</td></tr></tbody></table></div><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">w/Tracking.</span><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">Expedited Shipping.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We will ship to world wide by EMS or FedEX or DHL.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We will decide the shipping method.</span><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">Please contact us in advance if specified.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">It may be delayed depending on the delivery area, but we will ship as soon as possible.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We will ship your item within 2-10 business days, after your payment.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We can ship ONLY to your Paypal address.</span><p style=\"font-size: 14px; font-weight: 400;\"></p></h2><div><span style=\"font-size: 14px; font-weight: 400;\"><br></span></div><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Term of Sale</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">We can accept return within 30 days after you receive it.<br>Please make sure to contact us first if you want to return it.<br>It is buyer\'s responsibility for the return shipping cost when sending back the item to us.<br>The item has to be returned in the original condition from the time you received.<br>No returns on products that show any evidences of use.</p><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><br></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>About Us</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">A specialty shop offering a wide variety of carefully selected Japanese brand items.<br>Even if you think to yourself, \"But the item I want is only available in Japan.\", make sure to consult with us before giving up hope.<br>We will look for and suggest the best products on your behalf.</p><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><br></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>International Buyers - Please Note:</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">Import duties, taxes and charges are not included in the item price or shipping charges. These charges are the buyer\'\'s responsibility.<br>Please check with your country\'\'s customs office to determine what these additional costs will be prior to bidding/buying.<br>These charges are normally collected by the delivering freight (shipping) company or when you pick the item up - do not confuse them for additional shipping charges.<br><br>If your country is a non-shipping country, please contact us.<br>I will estimate the shipping cost.</p></h2></font>'
         return html_text.replace('●●', Description)
 
+    # 抽出対象による要素変更処理
+    def element_set(self, output_check):
+        # 抽出する画面で変わる情報
+        if(output_check == '商品一覧'):
+            # URL ?b=に変更
+            page_url_after[0] = '&b='
+            # 一覧ページの読み込み待ち対象
+            until_element_top[0] = 'Products__items'
+            # リストのタグ
+            items_list_tagName[0] = 'li'
+            # リストのクラス名
+            items_list_className[0] = 'Product'
+            # 価格情報
+            price_info_className[0] = 'Price--buynow'
+            # 価格情報の文字列
+            price_text[0] = '即決'
+            # 送料情報
+            postageDetail_element_text[0] = 'postageDetailBuy'
+        else:
+            # URL ?b=に変更
+            page_url_after[0] = '?b='
+            # 一覧ページの読み込み待ち対象
+            until_element_top[0] = 'cf'
+            # until_element_top[0] = 'inner cf'
+            # リストのタグ
+            items_list_tagName[0] = 'div'
+            # リストのクラス名
+            items_list_className[0] = 'bd cf'
+            # 価格情報
+            price_info_className[0] = 'Price--current'
+            # 価格情報の文字列
+            price_text[0] = '現在'
+            # 送料情報
+            postageDetail_element_text[0] = 'postageDetailCurrent'
+
     # 一覧ページから情報を取り出す
     # 商品一覧から取り出す情報
     # ・商品名
     # ・商品の状態（中古とか可,良いとか）
     # ・値段、送料
-
     def get_top_detail(self, driver, wait, main_url, num_list):
         # ファイルの読み込み
         delete_before_file = pd.read_csv(
@@ -237,25 +261,19 @@ class MyScraping():
         # ページごと
         for i in range(int(num_list[0]), int(num_list[1]) + 1):
             eel.view_log_js("\n" + str(i) + "ページ目開始")
-            page_url = main_url + "&b=" + str(i+(i*100-100))
+            # 変更点
+            page_url = main_url + page_url_after[0] + str(i+(i*100-100))
             driver.get(page_url)
             wait.until(EC.visibility_of_element_located(
-                (By.CLASS_NAME, "Products__items")))
+                (By.CLASS_NAME, until_element_top[0])))
             # items = driver.find_elements_by_class_name('Products__items')
 
             html = driver.page_source.encode('utf-8')
 
-            # ＝＝＝＝＝＝＝＝＝＝追記分＝＝＝＝＝＝＝＝＝＝＝＝
             soup = BeautifulSoup(html, 'lxml')
-
-            items = soup.find_all("li", class_="Product")
-            print(len(items))
-
-            for item in items:
-                item_id = item.findAll("a")[0].get("data-auction-id")
-                # print('============================================')
-                # print(item_id)
-
+            # items = soup.find_all('div', class_='Product')
+            items = soup.find_all(items_list_tagName[0],
+                                  class_=items_list_className[0])
             item_counter = 0
             # アイテムごと
             for j, item in enumerate(items):
@@ -266,10 +284,11 @@ class MyScraping():
                     (By.CLASS_NAME, 'ProductImage__inner')))
                 html = driver.page_source.encode('utf-8')
                 soup = BeautifulSoup(html, 'lxml')
-                Price_buynow = soup.find_all("div", class_="Price--buynow")
-                if (len(Price_buynow) == 0):
+                Price_info = soup.find_all(
+                    "div", class_=price_info_className[0])
+                if (len(Price_info) == 0):
                     eel.view_log_js(str(j + 1) + "/" +
-                                    str(len(items)) + "商品目 即決価格なし 除外")
+                                    str(len(items)) + "商品目 " + price_text[0] + "価格なし 除外")
                     continue
                 print('============================================')
                 print('item_id')
@@ -319,13 +338,13 @@ class MyScraping():
                 # 配送料無料ではない商品をピックアップする。
                 if (len(postage_price_free_element) == 0):
                     # 着払いではない商品をピックアップする。
-                    postage_price_text_element = Price_buynow[0].findAll(
+                    postage_price_text_element = Price_info[0].findAll(
                         "span", class_="Price__postageValue")[0].text
                     # if(postage_price_text_element != '着払い'):
                     # 料金はpostage_priceで取得し計算する
                     postage_price_list.append(item_id)
 
-                price_element = Price_buynow[0].findAll(
+                price_element = Price_info[0].findAll(
                     "dd", class_="Price__value")[0].text
                 item_price = 0
                 if '税込' in price_element:
@@ -362,7 +381,7 @@ class MyScraping():
                 items_name_en.append(item_name_en)
                 items_id.append(item_id)
                 items_price.append(item_price)
-                top_img_urls.append(image_urls)
+                items_image_url.append(image_urls)
                 items_Descriptions.append(item_Description)
                 items_condition_en.append(item_condition_en)
 
@@ -392,9 +411,9 @@ class MyScraping():
                 # print(len(items_price))
                 # # print(items_price)
 
-                # print('top_img_urls')
-                # print(len(top_img_urls))
-                # # print(top_img_urls)
+                # print('items_image_url')
+                # print(len(items_image_url))
+                # # print(items_image_url)
 
                 # print('items_Descriptions')
                 # print(len(items_Descriptions))
@@ -404,85 +423,7 @@ class MyScraping():
                 # print(len(items_condition_en))
                 # # print(items_condition_en)
 
-        return items_name_ja, top_img_urls
-
-    # 各商品の検索
-    # 楽天apiから取るもの
-    # ・商品の説明
-    # ・画像URL
-    # ・商品id
-    def get_item_details(self, driver, wait, item_name, top_img_url):
-
-        # APIの設定
-        params = self.set_api_parameter()
-        params["keyword"] = item_name
-
-        try:
-            item = self.get_api(params)["Items"]
-
-            if item:
-                item_image_url = item[0]["mediumImageUrls"]
-                item_image_url = self.image_url_add(item_image_url)
-                item_url = item[0]["itemUrl"]
-                item_id = item_url.replace(
-                    'https://item.rakuten.co.jp/', '')[:-1]
-
-            else:
-                url = 'https://www.rakuten.co.jp/'
-                driver.get(url)
-                wait.until(EC.visibility_of_element_located(
-                    (By.CLASS_NAME, 'input-text--37z4R')))
-                driver.find_element_by_class_name(
-                    'input-text--37z4R').send_keys(item_name)
-                driver.find_element_by_xpath(
-                    '//*[@id="wrapper"]/div[5]/div/div/div/div[1]/div/div/div/a').click()
-
-                try:
-                    driver.find_element_by_xpath(
-                        '/html/body/div[3]/div[2]/div[3]/div/div[1]/div[2]/h2/a').click()
-                    wait.until(EC.visibility_of_element_located(
-                        (By.CLASS_NAME, 'item_desc')))
-                    item_id = driver.current_url.replace(
-                        'https://item.rakuten.co.jp/', '')[:-1]
-                    item_image_url = top_img_url
-
-                except NoSuchElementException:
-                    item_image_url = top_img_url
-                    item_id = nan
-
-                except TimeoutException:
-                    item_image_url = top_img_url
-                    item_id = nan
-
-        except KeyError:
-            url = 'https://www.rakuten.co.jp/'
-            driver.get(url)
-            wait.until(EC.visibility_of_element_located(
-                (By.CLASS_NAME, 'input-text--37z4R')))
-            driver.find_element_by_class_name(
-                'input-text--37z4R').send_keys(item_name)
-            driver.find_element_by_xpath(
-                '//*[@id="wrapper"]/div[5]/div/div/div/div[1]/div/div/div/a').click()
-
-            try:
-                driver.find_element_by_xpath(
-                    '/html/body/div[3]/div[2]/div[3]/div/div[1]/div[2]/h2/a').click()
-                wait.until(EC.visibility_of_element_located(
-                    (By.CLASS_NAME, 'item_desc')))
-                item_id = driver.current_url.replace(
-                    'https://item.rakuten.co.jp/', '')[:-1]
-                item_image_url = top_img_url
-
-            except NoSuchElementException:
-                item_image_url = top_img_url
-                item_id = nan
-
-            except TimeoutException:
-                item_image_url = top_img_url
-                item_id = nan
-
-        items_image_url.append(item_image_url)
-        items_id.append(item_id)
+        return items_name_ja, items_image_url
 
     def postage_price(self, driver, wait, Todofuken_name):
         # ===========Seleniumで送料取得================
@@ -498,12 +439,11 @@ class MyScraping():
                 (By.CLASS_NAME, "ProductInformation__item")))
             driver.execute_script(
                 'document.querySelector("#js-prMdl-close").click()')
-            postageDetailBuy_element = driver.find_element_by_id(
-                "postageDetailBuy")
+            postageDetail_element = driver.find_element_by_id(
+                postageDetail_element_text[0])
             try:
-                postageDetailBuy_element.click()
+                postageDetail_element.click()
             except ElementNotInteractableException:
-                print('ElementNotInteractableException')
                 continue
 
             select_element = driver.find_element_by_xpath(
@@ -541,35 +481,16 @@ def main():
         driver = set_driver(driver_path)
         driver.implicitly_wait(10)
         wait = WebDriverWait(driver, 5)
-
         myscraping = MyScraping()
         num_list = eel.page()().split(',')
+        myscraping.element_set(eel.output_check()())
         Todofuken_name = eel.Todofuken_name()()
-        name_list, top_img_urls = myscraping.get_top_detail(
+        name_list, items_image_url = myscraping.get_top_detail(
             driver, wait, eel.url()(), num_list)
         eel.view_log_js('\n商品一覧ページからの収集が完了しました')
         eel.view_log_js('\n商品の送料情報を収集します')
         myscraping.postage_price(driver, wait, Todofuken_name)
         driver.quit()
-
-        # i = 1
-        # for name, img in zip(name_list, top_img_urls):
-        #     if i == 1:
-        #         driver = set_driver(driver_path)
-        #         driver.implicitly_wait(30)
-        #         wait = WebDriverWait(driver, 10)
-        #     if i % 100 == 0:
-        #         driver.quit()
-        #         if os.name == 'nt':  # Windows
-        #             driver = set_driver(driver_path)
-        #         elif os.name == 'posix':  # Mac
-        #             driver = set_driver(driver_path)
-        #         driver.implicitly_wait(30)
-        #         wait = WebDriverWait(driver, 10)
-
-        #     myscraping.get_item_details(driver, wait, name, img)
-        #     eel.view_log_js(str(i) + "/" + str(len(name_list)) + "件目")
-        #     i += 1
 
         eel.view_log_js('商品の送料情報収集が完了しました')
         eel.view_log_js('\nファイルの作成をします')
@@ -581,17 +502,13 @@ def main():
             "N": items_name_en,
             "O": items_id,
             "Q": items_price,
-            "W": top_img_urls,
+            "W": items_image_url,
             "X": items_Descriptions,
             "Y": items_condition_en
         }
         result_df = pd.DataFrame(result_array)
-        print('result_df1')
-        print(len(result_df))
 
         result_df.dropna(subset=['O', 'Y'], inplace=True)
-        print('result_df2')
-        print(len(result_df))
 
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -606,8 +523,8 @@ def main():
 
         for column_name, item_list in result_df.iteritems():
             i = 2
-            print('len(item_list)')
-            print(len(item_list))
+            # print('len(item_list)')
+            # print(len(item_list))
             for item in item_list:
                 ws[column_name + str(i)] = item
                 i += 1

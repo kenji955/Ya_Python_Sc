@@ -5,10 +5,10 @@
   </head>
   <body>
     抽出対象選択<br />
-    <input type="radio" name="example" value="商品一覧" checked>商品一覧
-    <input type="radio" name="example" value="出品リスト">出品リスト<br />
-    <input type="checkbox" name="riyu" value="2">型番のみの抽出を行う<br />
-    都道府県名：<input type="search" id="Todofuken_name" value="石川県" /><br />
+    <input type="radio" name="output_style" value="商品一覧" checked>商品一覧
+    <input type="radio" name="output_style" value="出品リスト">出品リスト<br />
+    <input type="checkbox" name="kataban" value="1">型番のみの抽出を行う<br />
+    都道府県名：<input type="search" id="Todofuken_name" placeholder="都道府県" value="石川県" /><br />
     商品一覧URL：<input type="search" id="url" value="https://auctions.yahoo.co.jp/search/search?va=%E3%82%AE%E3%82%BF%E3%83%BC&istatus=2&exflg=1&b=1&n=100&s1=new&o1=d&auccat=&tab_ex=commerce&ei=utf-8&aq=-1&oq=&sc_i=&exflg=1&p=%E3%82%AE%E3%82%BF%E3%83%BC&x=16&y=22"/><br />
     ページ数(,区切り)：<input type="search" id="page" value="1,1"/><br />
     商品名に追加するワード(,区切り)：<input type="search" id="add_word" value="testBefore,testAfter"/><br />
@@ -90,6 +90,18 @@
       function Todofuken_name() {
         return document.getElementById("Todofuken_name").value.trim();
       }
+      
+      eel.expose(output_check);
+      function output_check(){
+        elements = document.getElementsByName("output_style");
+        for(let i = 0; i<elements.length; i++){
+	        if(elements[i].checked){
+		        return elements[i].value;
+		        break;
+	        }
+        }
+      }
+      
 
     </script>
   </body>
