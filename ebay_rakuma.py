@@ -23,7 +23,7 @@ from selenium.webdriver.support.select import Select
 items_id = []
 items_condition = []
 items_name_ja = []
-items_name_en = []
+items_name_result = []
 items_condition_en = []
 items_price = []
 items_image_url = []
@@ -240,7 +240,7 @@ class MyScraping():
     # ・商品名
     # ・商品の状態（中古とか可,良いとか）
     # ・値段、送料
-    def get_top_detail(self, driver, wait, main_url, num_list):
+    def get_top_detail(self, driver, wait, main_url, num_list, output_style):
         # ファイルの読み込み
         delete_before_file = pd.read_csv(
             './' + eel.delete_word_before()(), header=None, names=['削除するワード_before'])
@@ -258,11 +258,19 @@ class MyScraping():
         add_name_split_dot = add_name.split(',')
         add_name_split_brank = add_name.replace(",", " ").split(" ")
 
+        # 型番のみの出力を行うか判別するフラグ
+        kataban_check_flug = eel.kataban_check()()
+        eel.view_log_js(kataban_check_flug)
+
+        page_num = 1
         # ページごと
         for i in range(int(num_list[0]), int(num_list[1]) + 1):
             eel.view_log_js("\n" + str(i) + "ページ目開始")
-            # 変更点
-            page_url = main_url + page_url_after[0] + str(i+(i*100-100))
+            if i == int(num_list[0]):
+                page_url = main_url
+            else:
+                page_url = main_url + page_url_after[0] + str(page_num)
+            eel.view_log_js(page_url)
             driver.get(page_url)
             wait.until(EC.visibility_of_element_located(
                 (By.CLASS_NAME, until_element_top[0])))
@@ -274,6 +282,25 @@ class MyScraping():
             # items = soup.find_all('div', class_='Product')
             items = soup.find_all(items_list_tagName[0],
                                   class_=items_list_className[0])
+            # 初回入力が2ページ目から、１００項目単位表示の場合、欲しい数値は201
+            # 初回入力が1ページ目から、１００項目単位表示の場合、欲しい数値は101
+            page_num = (len(items) * i) + 1
+            if(i == int(num_list[0])):
+                page_url = main_url + page_url_after[0] + str(page_num)
+                driver.get(page_url)
+                wait.until(EC.visibility_of_element_located(
+                    (By.CLASS_NAME, until_element_top[0])))
+                # items = driver.find_elements_by_class_name('Products__items')
+
+                html = driver.page_source.encode('utf-8')
+
+                soup = BeautifulSoup(html, 'lxml')
+                # items = soup.find_all('div', class_='Product')
+                items = soup.find_all(items_list_tagName[0],
+                                      class_=items_list_className[0])
+            if i == 1 and output_style == '商品一覧':
+                page_num -= 3
+
             item_counter = 0
             # アイテムごと
             for j, item in enumerate(items):
@@ -299,8 +326,13 @@ class MyScraping():
                 item_condition_element = soup.find_all(
                     "tr", class_="ProductTable__row")
                 # テキスト化
+                item_condition_element_search_index = 0
+                for k, element in enumerate(item_condition_element):
+                    if element.findAll('th')[0].text == '状態':
+                        item_condition_element_search_index = k
+
                 item_condition_text = re.sub(
-                    r'[\n ]', '', item_condition_element[1].findAll("a")[0].text)
+                    r'[\n ]', '', item_condition_element[item_condition_element_search_index].findAll("a")[0].text)
                 # 除外対象か判別。対象の場合飛ばして次の商品へ移動
                 if item_condition_text == '全体的に状態が悪い':
                     eel.view_log_js(str(j + 1) + "/" +
@@ -311,22 +343,36 @@ class MyScraping():
 
                 # 商品名 N列
                 # 商品名抽出
+                item_name_result = ''
                 item_name_ja_element = soup.find_all(
                     "h1", class_="ProductTitle__text")
                 item_name_ja = item_name_ja_element[0].text
-                item_name_ja_delete = self.delete_word_before(
-                    item_name_ja, delete_before_list)
-                item_name_en = self.translate(item_name_ja_delete)
-                item_name_en_delete_list = self.delete_word_after(
-                    item_name_en, delete_after_list, add_name_split_brank)
-                item_name_en = ' '.join(
-                    OrderedDict.fromkeys(item_name_en_delete_list))
-                item_name_en = self.add_word(
-                    add_name_len, item_name_en, add_word_list)
-                item_name_en = add_name_split_dot[0] + " " + \
-                    item_name_en + " " + add_name_split_dot[1]
-                item_name_en = re.sub(r'([\s]+)', ' ', item_name_en)
-                item_name_en = item_name_en.title()
+                if kataban_check_flug:
+                    # 型番抽出
+                    # 英数字もしくはハイフンを抽出
+                    item_name_kataban = re.findall(
+                        '[a-zA-Z0-9_]+|-', item_name_ja, flags=re.IGNORECASE)
+                    # 抽出した文字列を連結
+                    result_kataban = ''
+                    for kataban in item_name_kataban:
+                        result_kataban = result_kataban + kataban + ' '
+                    # 末尾のスペースを削除し抽出完了
+                    item_name_result = result_kataban.rstrip()
+
+                else:
+                    item_name_ja_delete = self.delete_word_before(
+                        item_name_ja, delete_before_list)
+                    item_name_en = self.translate(item_name_ja_delete)
+                    item_name_en_delete_list = self.delete_word_after(
+                        item_name_en, delete_after_list, add_name_split_brank)
+                    item_name_en = ' '.join(
+                        OrderedDict.fromkeys(item_name_en_delete_list))
+                    item_name_en = self.add_word(
+                        add_name_len, item_name_en, add_word_list)
+                    item_name_en = add_name_split_dot[0] + " " + \
+                        item_name_en + " " + add_name_split_dot[1]
+                    item_name_en = re.sub(r'([\s]+)', ' ', item_name_en)
+                    item_name_result = item_name_en.title()[:80]
 
                 # 商品識別ID O列
                 # 取得済み
@@ -340,9 +386,9 @@ class MyScraping():
                     # 着払いではない商品をピックアップする。
                     postage_price_text_element = Price_info[0].findAll(
                         "span", class_="Price__postageValue")[0].text
-                    # if(postage_price_text_element != '着払い'):
-                    # 料金はpostage_priceで取得し計算する
-                    postage_price_list.append(item_id)
+                    if(not('商品説明参照' in postage_price_text_element)):
+                        # 料金はpostage_priceで取得し計算する
+                        postage_price_list.append(item_id)
 
                 price_element = Price_info[0].findAll(
                     "dd", class_="Price__value")[0].text
@@ -378,7 +424,7 @@ class MyScraping():
                 # 各データを格納
                 items_condition.append(item_condition_id)
                 items_name_ja.append(item_name_ja)
-                items_name_en.append(item_name_en)
+                items_name_result.append(item_name_result)
                 items_id.append(item_id)
                 items_price.append(item_price)
                 items_image_url.append(image_urls)
@@ -399,9 +445,9 @@ class MyScraping():
                 # print(len(items_name_ja))
                 # # print(items_name_ja)
 
-                # print('items_name_en')
-                # print(len(items_name_en))
-                # # print(items_name_en)
+                # print('items_name_result')
+                # print(len(items_name_result))
+                # # print(items_name_result)
 
                 # print('items_id')
                 # print(len(items_id))
@@ -433,6 +479,8 @@ class MyScraping():
         for i, item in enumerate(postage_price_list):
             print('item')
             print(item)
+            eel.view_log_js(str(i + 1) + "/" +
+                            str(len(postage_price_list)) + "商品目")
             driver.set_window_size('1920', '1080')
             driver.get("https://page.auctions.yahoo.co.jp/jp/auction/" + item)
             wait.until(EC.visibility_of_element_located(
@@ -448,10 +496,8 @@ class MyScraping():
 
             select_element = driver.find_element_by_xpath(
                 "//div[@class='SelectWrap']/select")
-            # select_element = driver.find_elements_by_class_name("Select")
             select_object = Select(select_element)
             select_object.select_by_visible_text(Todofuken_name)
-            # time.sleep(3)
 
             postagePrice_element = driver.find_element_by_xpath(
                 "//dd[@class='BidModal__postageDetail']/div[@class='BidModal__postagePrice']")
@@ -467,9 +513,6 @@ class MyScraping():
             index = items_id.index(item)
             items_price[index] = str(
                 int(items_price[index]) + int(postagePrice))
-            eel.view_log_js(str(i + 1) + "/" +
-                            str(len(postage_price_list)) + "商品目")
-            # time.sleep(5)
 
 
 def main():
@@ -483,10 +526,11 @@ def main():
         wait = WebDriverWait(driver, 5)
         myscraping = MyScraping()
         num_list = eel.page()().split(',')
-        myscraping.element_set(eel.output_check()())
+        output_style = eel.output_check()()
+        myscraping.element_set(output_style)
         Todofuken_name = eel.Todofuken_name()()
         name_list, items_image_url = myscraping.get_top_detail(
-            driver, wait, eel.url()(), num_list)
+            driver, wait, eel.url()(), num_list, output_style)
         eel.view_log_js('\n商品一覧ページからの収集が完了しました')
         eel.view_log_js('\n商品の送料情報を収集します')
         myscraping.postage_price(driver, wait, Todofuken_name)
@@ -499,7 +543,7 @@ def main():
 
         result_array = {
             "M": items_condition,
-            "N": items_name_en,
+            "N": items_name_result,
             "O": items_id,
             "Q": items_price,
             "W": items_image_url,

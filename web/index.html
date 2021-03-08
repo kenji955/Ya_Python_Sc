@@ -5,16 +5,16 @@
   </head>
   <body>
     抽出対象選択<br />
-    <input type="radio" name="output_style" value="商品一覧" checked>商品一覧
-    <input type="radio" name="output_style" value="出品リスト">出品リスト<br />
-    <input type="checkbox" name="kataban" value="1">型番のみの抽出を行う<br />
-    都道府県名：<input type="search" id="Todofuken_name" placeholder="都道府県" value="石川県" /><br />
-    商品一覧URL：<input type="search" id="url" value="https://auctions.yahoo.co.jp/search/search?va=%E3%82%AE%E3%82%BF%E3%83%BC&istatus=2&exflg=1&b=1&n=100&s1=new&o1=d&auccat=&tab_ex=commerce&ei=utf-8&aq=-1&oq=&sc_i=&exflg=1&p=%E3%82%AE%E3%82%BF%E3%83%BC&x=16&y=22"/><br />
+    <label><input type="radio" name="output_style" value="商品一覧" checked>商品一覧</label>
+    <label><input type="radio" name="output_style" value="出品リスト">出品リスト</label><br />
+    <label><input type="checkbox" id="kataban" value="1" onclick="checkdiv()">型番のみの抽出を行う</label><br />
+    都道府県名：<input type="search" id="Todofuken_name" placeholder="都道府県" /><br />
+    商品一覧URL：<input type="search" id="url" /><br />
     ページ数(,区切り)：<input type="search" id="page" value="1,1"/><br />
-    商品名に追加するワード(,区切り)：<input type="search" id="add_word" value="testBefore,testAfter"/><br />
-    削除するワードのファイル(翻訳前)：<input type="search" id="delete_word_before" value="delete_word_before.csv"/><br />
-    削除するワードのファイル(翻訳後)：<input type="search" id="delete_word_after" value="delete_word_after.csv"/><br />
-    補充するワードのファイル名：<input type="search" id="fill_in_word" value="fill_in_word.csv"/><br />
+    <label class="toggle">商品名に追加するワード(,区切り)：<input type="search" id="add_word" value="Before,After"/><br /></label>
+    <label class="toggle">削除するワードのファイル(翻訳前)：<input type="search" id="delete_word_before" value="delete_word_before.csv"/><br /></label>
+    <label class="toggle">削除するワードのファイル(翻訳後)：<input type="search" id="delete_word_after" value="delete_word_after.csv"/><br /></label>
+    <label class="toggle">補充するワードのファイル名：<input type="search" id="fill_in_word" value="fill_in_word.csv"/><br /></label>
     作成するファイル名：<input type="search" id="file_name" value=".xlsx"/><br />
     <button id="button">実行</button><br />
     <b><textarea id="textarea" rows="20" cols="50"></textarea></b>
@@ -45,6 +45,21 @@
           eel.main();
         }
       });
+
+      function checkdiv() {
+        element = document.getElementById('kataban');
+        style_display = ''
+        if( element.checked ){
+          style_display = "none";
+        }
+        else {
+          style_display = "block";
+        }
+        elements = document.getElementsByClassName('toggle')
+        for(let i = 0; i<elements.length; i++){
+          elements[i].style.display = style_display
+        }
+      }
 
       eel.expose(url);
       function url() {
@@ -85,11 +100,6 @@
       function view_log_js(text) {
         document.getElementById("textarea").value += text + "\n";
       }
-
-      eel.expose(Todofuken_name);
-      function Todofuken_name() {
-        return document.getElementById("Todofuken_name").value.trim();
-      }
       
       eel.expose(output_check);
       function output_check(){
@@ -100,6 +110,17 @@
 		        break;
 	        }
         }
+      }
+
+      eel.expose(kataban_check);
+      function kataban_check() {
+        const kataban_element = document.getElementById("kataban");
+        return kataban_element.checked;
+      }
+
+      eel.expose(Todofuken_name);
+      function Todofuken_name() {
+        return document.getElementById("Todofuken_name").value.trim();
       }
       
 
