@@ -27,7 +27,6 @@ items_name_result = []
 items_condition_en = []
 items_price = []
 items_image_url = []
-items_Descriptions = []
 postage_price_list = []
 
 
@@ -195,11 +194,6 @@ class MyScraping():
             else:
                 return word
 
-    # 商品説明文字列作成
-    def Description_string(self, Description):
-        html_text = '<font rwr=\"1\" size=\"4\" style=\"font-family:Arial\"><div class=\"banner_topr\" style=\"height: 200px; width: 100%; background-image: url(\'https://www.saatscommerce.com/te_rsc/XOther_Japanese_c04/us/images/c_top.jpg\'); background-repeat: no-repeat; background-size: cover; \"></div><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Description</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"></p><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><span style=\"font-size: large;\"><span style=\"font-family: &quot;Noto Sans JP&quot;, sans-serif; background-color: rgb(255, 255, 255);\">Please see the attached photographs for detailed item conditions.<br><br>●●<br><br><b>This product is 100% authentic.<br>We have several other items in stock, so please contact us.<br><br><br>[Customer\'s Feedback!]<br>\"OUTSTANDING SELLER! Fast shipping. Thanks so much for a wonderful transaction.\"<br>\"Fast delivery, perfect product. 100% satisfied. 5 star to seller. Thank you..\"<br>\"Totally worth it!!!thanks again awesome deck!!It arrived thanks!!\"<br>\"Amazing communication and ship speed. Items exactly as described. A+++ Thank u!!\"<br>\"Really beautiful transaction and super fast shipment from Japan, thank you!\"<br>\"Excellent service provided by the seller from start to end! Highly Recommended!\"<br>\"***Highly recommend to purchase from this seller*** Really friendly and reliable\"<br><br>...Thank You!</b></span><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><span style=\"font-size: large;\"><span style=\"font-family: &quot;Noto Sans JP&quot;, sans-serif; background-color: rgb(255, 255, 255);\"><br></span></span></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Payment</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">We only accept PayPal payments.<br>Please pay within 5 days after auction is finished.</p><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><br></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Shipping</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"></p><br style=\"font-size: 14px; font-weight: 400;\"><div id=\"shipping_duration_table\" style=\"font-size: 14px; font-weight: 400;\"><b>Shipping Duration</b><table class=\"table_shipping\" style=\"width: 770px; border: 1px solid rgb(0, 0, 0); border-collapse: collapse;\"><thead><tr><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Shipping<br>Method</th><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Asia, Middle East</th><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">America,Canada<br>Australia,Mexico</th><th style=\"width: 145px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Europe<br>Russia</th><th style=\"width: 144px; background-color: rgb(221, 221, 221); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">Other</th></tr></thead><tbody id=\"shipping_duration_tbody\"><tr><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">DHL, FedEX</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">2 - 3 days</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">3 - 5 days</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">3 - 4 days</td><td style=\"background-color: rgb(255, 255, 255); border: 1px solid rgb(0, 0, 0); padding: 4px; border-collapse: collapse;\">5 - 7 days</td></tr></tbody></table></div><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">w/Tracking.</span><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">Expedited Shipping.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We will ship to world wide by EMS or FedEX or DHL.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We will decide the shipping method.</span><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">Please contact us in advance if specified.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">It may be delayed depending on the delivery area, but we will ship as soon as possible.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We will ship your item within 2-10 business days, after your payment.</span><br style=\"font-size: 14px; font-weight: 400;\"><br style=\"font-size: 14px; font-weight: 400;\"><span style=\"font-size: 14px; font-weight: 400;\">We can ship ONLY to your Paypal address.</span><p style=\"font-size: 14px; font-weight: 400;\"></p></h2><div><span style=\"font-size: 14px; font-weight: 400;\"><br></span></div><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>Term of Sale</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">We can accept return within 30 days after you receive it.<br>Please make sure to contact us first if you want to return it.<br>It is buyer\'s responsibility for the return shipping cost when sending back the item to us.<br>The item has to be returned in the original condition from the time you received.<br>No returns on products that show any evidences of use.</p><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><br></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>About Us</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">A specialty shop offering a wide variety of carefully selected Japanese brand items.<br>Even if you think to yourself, \"But the item I want is only available in Japan.\", make sure to consult with us before giving up hope.<br>We will look for and suggest the best products on your behalf.</p><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\"><br></p></h2><h2 style=\"color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><p style=\"margin: 0px; font-size: 30px; color: rgb(139, 127, 62);\"><b>International Buyers - Please Note:</b></p></h2><h2 style=\"font-size: 14pt; color: rgb(51, 51, 51); margin: 0px; padding: 0px 0px 0px 10px;\"><hr size=\"5\" color=\"#8B7F3E\" style=\"font-size: 14px; font-weight: 400;\"><p style=\"font-weight: 400; margin: 0px; padding: 0px 30px 0px 20px; line-height: 28.8px; font-size: 16px;\">Import duties, taxes and charges are not included in the item price or shipping charges. These charges are the buyer\'\'s responsibility.<br>Please check with your country\'\'s customs office to determine what these additional costs will be prior to bidding/buying.<br>These charges are normally collected by the delivering freight (shipping) company or when you pick the item up - do not confuse them for additional shipping charges.<br><br>If your country is a non-shipping country, please contact us.<br>I will estimate the shipping cost.</p></h2></font>'
-        return html_text.replace('●●', Description)
-
     # 抽出対象による要素変更処理
     def element_set(self, output_check):
         # 抽出する画面で変わる情報
@@ -260,7 +254,6 @@ class MyScraping():
 
         # 型番のみの出力を行うか判別するフラグ
         kataban_check_flug = eel.kataban_check()()
-        eel.view_log_js(kataban_check_flug)
 
         page_num = 1
         # ページごと
@@ -270,32 +263,25 @@ class MyScraping():
                 page_url = main_url
             else:
                 page_url = main_url + page_url_after[0] + str(page_num)
-            eel.view_log_js(page_url)
             driver.get(page_url)
             wait.until(EC.visibility_of_element_located(
                 (By.CLASS_NAME, until_element_top[0])))
-            # items = driver.find_elements_by_class_name('Products__items')
 
             html = driver.page_source.encode('utf-8')
 
             soup = BeautifulSoup(html, 'lxml')
-            # items = soup.find_all('div', class_='Product')
             items = soup.find_all(items_list_tagName[0],
                                   class_=items_list_className[0])
-            # 初回入力が2ページ目から、１００項目単位表示の場合、欲しい数値は201
-            # 初回入力が1ページ目から、１００項目単位表示の場合、欲しい数値は101
             page_num = (len(items) * i) + 1
             if(i == int(num_list[0])):
                 page_url = main_url + page_url_after[0] + str(page_num)
                 driver.get(page_url)
                 wait.until(EC.visibility_of_element_located(
                     (By.CLASS_NAME, until_element_top[0])))
-                # items = driver.find_elements_by_class_name('Products__items')
 
                 html = driver.page_source.encode('utf-8')
 
                 soup = BeautifulSoup(html, 'lxml')
-                # items = soup.find_all('div', class_='Product')
                 items = soup.find_all(items_list_tagName[0],
                                       class_=items_list_className[0])
             if i == 1 and output_style == '商品一覧':
@@ -317,9 +303,6 @@ class MyScraping():
                     eel.view_log_js(str(j + 1) + "/" +
                                     str(len(items)) + "商品目 " + price_text[0] + "価格なし 除外")
                     continue
-                print('============================================')
-                print('item_id')
-                print(item_id)
 
                 # 商品のコンディションID M列
                 # 商品の状態情報抽出
@@ -411,11 +394,6 @@ class MyScraping():
                         break
                 image_urls = self.image_url_add(urls)
 
-                # 商品説明 X列
-                item_Description_element = soup.find_all(
-                    "div", class_="ProductExplanation__commentBody")
-                item_Description = self.Description_string(
-                    item_Description_element[0].text)
 
                 # 商品の状態 Y列
                 item_condition_en = self.judge_condition(
@@ -428,7 +406,6 @@ class MyScraping():
                 items_id.append(item_id)
                 items_price.append(item_price)
                 items_image_url.append(image_urls)
-                items_Descriptions.append(item_Description)
                 items_condition_en.append(item_condition_en)
 
                 eel.view_log_js(str(j + 1) + "/" + str(len(items)) + "商品目")
@@ -437,37 +414,6 @@ class MyScraping():
             else:
                 eel.view_log_js(str(i) + "ページ目終了")
                 eel.view_log_js(str(item_counter) + "件抽出")
-                # print('items_condition')
-                # print(len(items_condition))
-                # # print(items_condition)
-
-                # print('items_name_ja')
-                # print(len(items_name_ja))
-                # # print(items_name_ja)
-
-                # print('items_name_result')
-                # print(len(items_name_result))
-                # # print(items_name_result)
-
-                # print('items_id')
-                # print(len(items_id))
-                # # print(items_id)
-
-                # print('items_price')
-                # print(len(items_price))
-                # # print(items_price)
-
-                # print('items_image_url')
-                # print(len(items_image_url))
-                # # print(items_image_url)
-
-                # print('items_Descriptions')
-                # print(len(items_Descriptions))
-                # # print(items_Descriptions)
-
-                # print('items_condition_en')
-                # print(len(items_condition_en))
-                # # print(items_condition_en)
 
         return items_name_ja, items_image_url
 
@@ -477,8 +423,6 @@ class MyScraping():
         # item_idでitems_idのindexを検索し、
         # そのinndex番号に合致するitems_priceの項目を更新する
         for i, item in enumerate(postage_price_list):
-            print('item')
-            print(item)
             eel.view_log_js(str(i + 1) + "/" +
                             str(len(postage_price_list)) + "商品目")
             driver.set_window_size('1920', '1080')
@@ -504,8 +448,6 @@ class MyScraping():
 
             postagePrice = (postagePrice_element.text).split('円')[
                 0].replace(',', '')
-            print('postagePrice')
-            print(postagePrice)
             if(postagePrice == '送料未定'):
                 continue
             elif(postagePrice == '送料未定（着払い）'):
@@ -539,15 +481,12 @@ def main():
         eel.view_log_js('商品の送料情報収集が完了しました')
         eel.view_log_js('\nファイルの作成をします')
 
-        print('===============================')
-
         result_array = {
             "M": items_condition,
             "N": items_name_result,
             "O": items_id,
             "Q": items_price,
             "W": items_image_url,
-            "X": items_Descriptions,
             "Y": items_condition_en
         }
         result_df = pd.DataFrame(result_array)
@@ -562,13 +501,10 @@ def main():
         ws["O1"] = "CustomLabel"
         ws["Q1"] = "元値"
         ws["W1"] = "PicURL"
-        ws["X1"] = "*Description"
         ws["Y1"] = "ConditionDescription"
 
         for column_name, item_list in result_df.iteritems():
             i = 2
-            # print('len(item_list)')
-            # print(len(item_list))
             for item in item_list:
                 ws[column_name + str(i)] = item
                 i += 1
@@ -577,8 +513,8 @@ def main():
 
         eel.view_log_js('ファイルの作成が完了しました')
 
-    # except WebDriverException:
-    #     eel.view_log_js("一度、driversファイルとdrivers.jsonを削除してからやり直してください")
+    except WebDriverException:
+        eel.view_log_js("一度、driversファイルとdrivers.jsonを削除してからやり直してください")
 
     except Exception:
         import traceback
