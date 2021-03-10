@@ -331,8 +331,7 @@ class MyScraping():
                     eel.view_log_js(str(j + 1) + "/" +
                                     str(len(items)) + "商品目 状態が悪いため除外")
                     continue
-                # コンディションIDを設定
-                item_condition_id = '3000'
+                # コンディションIDは3000固定のため、ファイル出力直前に登録する。
 
                 # 商品名 N列
                 # 商品名抽出
@@ -485,6 +484,8 @@ def main():
         result_df = pd.DataFrame(result_array)
 
         result_df.dropna(subset=['O', 'Y'], inplace=True)
+        items_condition_list = [3000 for _ in range(len(result_df))]
+        result_array["M"] = items_condition_list
 
         wb = openpyxl.Workbook()
         ws = wb.active
