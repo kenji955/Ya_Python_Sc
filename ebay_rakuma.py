@@ -212,7 +212,6 @@ class MyScraping():
             # 送料情報
             postageDetail_element_text = 'postageDetailBuy'
         else:
-            print('check')
             # URL ?b=に変更
             page_url_after = '?b='
             # 一覧ページの読み込み待ち対象
@@ -282,9 +281,7 @@ class MyScraping():
                 item_num = int(Decimal(len(items)).quantize(Decimal('1E1'), rounding=ROUND_HALF_UP))
                 page_num = item_num * i + 1
                 page_url = main_url + page_url_after + str(page_num)
-                print(page_url)
                 driver.get(page_url)
-                print(until_element_top)
                 wait.until(EC.visibility_of_element_located(
                     (By.CLASS_NAME, until_element_top)))
                 html = driver.page_source.encode('utf-8')
@@ -295,7 +292,6 @@ class MyScraping():
                 items = soup.find_all(items_list_tagName,
                                       class_=items_list_className)
             for item in items[:]:
-                # print(item)
                 item_price_info = item.findAll(class_="Product__price")
                 result_text = ''
                 for info in item_price_info:
@@ -311,7 +307,6 @@ class MyScraping():
             # アイテムごと
             for j, item in enumerate(items):
                 item_id = item.findAll("a")[0].get("data-auction-id")
-                print(item_id)
                 page_url = 'https://page.auctions.yahoo.co.jp/jp/auction/' + item_id
                 driver.set_window_size('1920', '1080')
                 driver.get(page_url)
