@@ -4,7 +4,6 @@ import eel
 import pandas as pd
 import re
 import requests
-import time
 from googletrans import Translator
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException, ElementNotInteractableException
@@ -18,6 +17,7 @@ import openpyxl
 import subprocess
 from bs4 import BeautifulSoup
 from selenium.webdriver.support.select import Select
+from decimal import Decimal, ROUND_HALF_UP
 
 # 一覧ページから取得する情報
 items_id = []
@@ -29,6 +29,8 @@ items_price = []
 items_image_url = []
 postage_price_list = []
 
+# 一ページの商品表示数
+item_num = 50
 
 # 抽出対象で変わる情報
 # 商品一覧と出品リストそれぞれの抽出時に必要な要素を指定する情報を定義する。
@@ -253,10 +255,13 @@ class MyScraping():
         # 型番のみの出力を行うか判別するフラグ
         kataban_check_flug = eel.kataban_check()()
 
+        global item_num
         page_num = 1
         # ページごと
         for i in range(int(num_list[0]), int(num_list[1]) + 1):
             eel.view_log_js("\n" + str(i) + "ページ目開始")
+            # 初回の処理の場合、アプリに入力されたURLをそのまま使い表示して、
+            # ページ内の商品表示件数を取得する
             if i == int(num_list[0]):
                 page_url = main_url
             else:
@@ -270,8 +275,12 @@ class MyScraping():
             soup = BeautifulSoup(html, 'lxml')
             items = soup.find_all(items_list_tagName,
                                   class_=items_list_className)
-            page_num = (len(items) * i) + 1
-            if(i == int(num_list[0])):
+            page_num = item_num * i + 1
+            # 初回の処理の場合、上記の処理で取得した商品表示数をもとに、
+            # 与えられたページ数に該当する商品数(50件表示、２ページ目からであれば51)を算出する
+            if i == int(num_list[0]):
+                item_num = int(Decimal(len(items)).quantize(Decimal('1E1'), rounding=ROUND_HALF_UP))
+                page_num = item_num * i + 1
                 page_url = main_url + page_url_after + str(page_num)
                 print(page_url)
                 driver.get(page_url)
@@ -285,8 +294,18 @@ class MyScraping():
                 soup = BeautifulSoup(r.content, 'lxml')
                 items = soup.find_all(items_list_tagName,
                                       class_=items_list_className)
-            if i == 1 and output_style == '商品一覧':
-                page_num -= 3
+            for item in items[:]:
+                # print(item)
+                item_price_info = item.findAll(class_="Product__price")
+                result_text = ''
+                for info in item_price_info:
+                    result_text = result_text + \
+                        info.find(class_='Product__label').text
+                if not (price_text in result_text):
+                    items.remove(item)
+
+            # if i == 1 and output_style == '商品一覧':
+            #     page_num -= 3
 
             item_counter = 0
             # アイテムごと
@@ -303,13 +322,16 @@ class MyScraping():
 
                 r = requests.get(page_url)
                 soup = BeautifulSoup(r.content, 'lxml')
+                if 'block' in soup.find(id='js-prMdl').get('style'):
+                    driver.execute_script(
+                        'document.querySelector("#js-prMdl-close").click()')
 
                 Price_info = soup.find_all(
                     "div", class_=price_info_className)
-                if (len(Price_info) == 0):
-                    eel.view_log_js(str(j + 1) + "/" +
-                                    str(len(items)) + "商品目 " + price_text + "価格なし 除外")
-                    continue
+                # if (len(Price_info) == 0):
+                #     eel.view_log_js(str(j + 1) + "/" +
+                #                     str(len(items)) + "商品目 " + price_text + "価格なし 除外")
+                #     continue
 
                 # 商品のコンディションID M列
                 # 商品の状態情報抽出
@@ -345,6 +367,7 @@ class MyScraping():
                     item_name_kataban = re.findall(
                         '[a-zA-Z0-9_]+|-', item_name_ja, flags=re.IGNORECASE)
                     # 抽出した文字列を連結
+                    result_kataban = ''
                     for kataban in item_name_kataban:
                         result_kataban = result_kataban + kataban + ' '
                     # 末尾のスペースを削除し抽出完了
@@ -358,7 +381,7 @@ class MyScraping():
                         item_name_en, delete_after_list, add_name_split_brank)
                     item_name_en = ' '.join(
                         OrderedDict.fromkeys(item_name_en_delete_list))
-                    item_name_result = item_name_en.title()[:80]
+                    item_name_result = self.add_word(add_name_len, item_name_en, add_word_list)
 
                 # 商品識別ID O列
                 # 取得済み
@@ -381,14 +404,7 @@ class MyScraping():
                     postage_price_text_element = Price_info[0].findAll(
                         "span", class_="Price__postageValue")[0].text
                     if('商品説明参照' not in postage_price_text_element):
-                        # 料金はpostage_priceで取得し計算する
-                        # postage_price_list.append(item_id)
                         try:
-                            # driver.set_window_size('1920', '1080')
-                            # driver.get(
-                            #     "https://page.auctions.yahoo.co.jp/jp/auction/" + item)
-                            # wait.until(EC.visibility_of_element_located(
-                            #     (By.CLASS_NAME, "ProductInformation__item")))
                             driver.execute_script(
                                 'document.querySelector("#js-prMdl-close").click()')
                             postageDetail_element = driver.find_element_by_id(
@@ -434,7 +450,7 @@ class MyScraping():
                     item_condition_text.replace('\n', ''))
 
                 # 各データを格納
-                items_condition.append(item_condition_id)
+                # items_condition.append(item_condition_id)
                 items_name_ja.append(item_name_ja)
                 items_name_result.append(item_name_result)
                 items_id.append(item_id)
@@ -474,7 +490,7 @@ def main():
         eel.view_log_js('\nファイルの作成をします')
 
         result_array = {
-            "M": items_condition,
+            # "M": items_condition,
             "N": items_name_result,
             "O": items_id,
             "Q": items_price,
